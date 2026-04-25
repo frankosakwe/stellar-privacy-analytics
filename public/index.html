@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stellar Privacy Analytics - Automated Risk Assessment</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-shield-alt me-2"></i>
+                Stellar Privacy Analytics
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#assessment">Assessment</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#compliance">Compliance</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#visualization">Visualization</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container-fluid py-4">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="mb-5">
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="h3 mb-4">
+                        <i class="fas fa-tachometer-alt me-2"></i>
+                        Risk Assessment Dashboard
+                    </h1>
+                </div>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-danger text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="card-title" id="criticalCount">0</h4>
+                                    <p class="card-text">Critical Risks</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-exclamation-triangle fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="card-title" id="highCount">0</h4>
+                                    <p class="card-text">High Risks</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-exclamation-circle fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="card-title" id="avgRiskScore">0</h4>
+                                    <p class="card-text">Avg Risk Score</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-chart-line fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="card-title" id="complianceRate">0%</h4>
+                                    <p class="card-text">Compliance Rate</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-check-circle fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Risk Distribution</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="riskDistributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Risk Trends</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="riskTrendsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Risk Heatmap -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Risk Heatmap</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="riskHeatmap"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Assessment Section -->
+        <section id="assessment" class="mb-5">
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="h3 mb-4">
+                        <i class="fas fa-clipboard-check me-2"></i>
+                        Privacy Risk Assessment
+                    </h1>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Workflow Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="assessmentForm">
+                                <div class="mb-3">
+                                    <label for="workflowName" class="form-label">Workflow Name</label>
+                                    <input type="text" class="form-control" id="workflowName" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="dataTypes" class="form-label">Data Types</label>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="name" id="dataType_name">
+                                                <label class="form-check-label" for="dataType_name">Name</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="email" id="dataType_email">
+                                                <label class="form-check-label" for="dataType_email">Email</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="phone" id="dataType_phone">
+                                                <label class="form-check-label" for="dataType_phone">Phone</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="address" id="dataType_address">
+                                                <label class="form-check-label" for="dataType_address">Address</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="health" id="dataType_health">
+                                                <label class="form-check-label" for="dataType_health">Health Data</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="financial" id="dataType_financial">
+                                                <label class="form-check-label" for="dataType_financial">Financial Data</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="biometric" id="dataType_biometric">
+                                                <label class="form-check-label" for="dataType_biometric">Biometric Data</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="political" id="dataType_political">
+                                                <label class="form-check-label" for="dataType_political">Political Views</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="processingActivities" class="form-label">Processing Activities</label>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="analytics" id="activity_analytics">
+                                                <label class="form-check-label" for="activity_analytics">Analytics</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="marketing" id="activity_marketing">
+                                                <label class="form-check-label" for="activity_marketing">Marketing</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="sharing" id="activity_sharing">
+                                                <label class="form-check-label" for="activity_sharing">Data Sharing</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="profiling" id="activity_profiling">
+                                                <label class="form-check-label" for="activity_profiling">Profiling</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="automated_decision" id="activity_automated_decision">
+                                                <label class="form-check-label" for="activity_automated_decision">Automated Decision Making</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="systematic_monitoring" id="activity_systematic_monitoring">
+                                                <label class="form-check-label" for="activity_systematic_monitoring">Systematic Monitoring</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="encryptionStatus" class="form-label">Encryption Status</label>
+                                    <select class="form-select" id="encryptionStatus">
+                                        <option value="none">No Encryption</option>
+                                        <option value="partial">Partial Encryption</option>
+                                        <option value="full">Full Encryption</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="accessControl" class="form-label">Access Control</label>
+                                    <select class="form-select" id="accessControl">
+                                        <option value="none">No Access Control</option>
+                                        <option value="basic">Basic Access Control</option>
+                                        <option value="rbac">Role-Based Access Control</option>
+                                        <option value="advanced">Advanced Access Control</option>
+                                    </select>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-play me-2"></i>
+                                    Run Assessment
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Assessment Results</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="assessmentResults">
+                                <p class="text-muted">Complete the form and run assessment to see results.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Compliance Section -->
+        <section id="compliance" class="mb-5">
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="h3 mb-4">
+                        <i class="fas fa-balance-scale me-2"></i>
+                        Compliance Frameworks
+                    </h1>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Select Framework</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="complianceFramework" class="form-label">Framework</label>
+                                <select class="form-select" id="complianceFramework">
+                                    <option value="">Select Framework...</option>
+                                    <option value="gdpr">GDPR</option>
+                                    <option value="ccpa">CCPA</option>
+                                    <option value="hipaa">HIPAA</option>
+                                    <option value="pdpa">PDPA (Singapore)</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" id="checkCompliance">
+                                <i class="fas fa-check me-2"></i>
+                                Check Compliance
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Compliance Results</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="complianceResults">
+                                <p class="text-muted">Select a framework and check compliance to see results.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Visualization Section -->
+        <section id="visualization" class="mb-5">
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="h3 mb-4">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Risk Visualization
+                    </h1>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Interactive Risk Heatmap</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="interactiveHeatmap"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Stellar Privacy Analytics</h5>
+                    <p>Automated privacy risk assessment and compliance management platform.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">&copy; 2024 Stellar Privacy Analytics. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/assessment.js"></script>
+    <script src="js/compliance.js"></script>
+    <script src="js/visualization.js"></script>
+</body>
+</html>
